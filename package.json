@@ -1,0 +1,13 @@
+{
+  "name": "cocos_test",
+  "uuid": "bdc3573e-85a5-45f0-b759-56734c3758cb",
+  "creator": {
+    "version": "3.8.6",
+    "registry": {
+      "remote": {}
+    },
+    "dependencies": {
+      "localization-editor": "1.0.2"
+    }
+  }
+}
