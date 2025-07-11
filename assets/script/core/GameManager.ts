@@ -12,8 +12,16 @@ enum GameState {
     GameOver,
 }
 
+export enum Direction {
+    Up ,
+    Down,
+    Left,
+    Right,
+}
+
 @ccclass('GameManager')
 export class GameManager extends Component {
+    // 管理器单例，仅用于
     public static Instance: GameManager = null;
 
     @property({ type: Number, tooltip: '每个格子的像素大小' })
@@ -67,13 +75,9 @@ export class GameManager extends Component {
         this.score = 0;
         this.uiMain?.updateScore(this.score);
         this.uiGameOver?.hide();
-        this.snake.init();
+        this.snake.init(this.cellSize, this.gridWidth, this.gridHeight);
         this.snake.reset();
-        if (this.foodSpawner) {
-            this.foodSpawner.cellSize = this.cellSize;
-            this.foodSpawner.gridWidth = this.gridWidth;
-            this.foodSpawner.gridHeight = this.gridHeight;
-        }
+        this.foodSpawner.init(this.cellSize, this.gridWidth, this.gridHeight);
         this.foodSpawner.spawnFood(this.snake.getBody());
     }
 
@@ -90,6 +94,26 @@ export class GameManager extends Component {
         }
 
         this.snake.render();
+    }
+
+    updateSnakeDirection(direction: Direction) {
+        if(!this.snake||this.gameState !== GameState.Playing){
+            return;
+        }
+        switch (direction) {
+            case Direction.Up:
+                this.snake.setDirection(0, 1);
+                break;
+            case Direction.Down:
+                this.snake.setDirection(0, -1);
+                break;
+            case Direction.Left:
+                this.snake.setDirection(-1, 0);
+                break;
+            case Direction.Right:
+                this.snake.setDirection(1, 0);
+                break;
+        }
     }
 
     checkCollision(): boolean {
@@ -111,6 +135,14 @@ export class GameManager extends Component {
         return foodPos && headPos.x === foodPos.x && headPos.y === foodPos.y;
     }
 
+    pauseGame() {
+        if (this.gameState === GameState.Playing) {
+            this.gameState = GameState.Paused;
+        } else if (this.gameState === GameState.Paused) {
+            this.gameState = GameState.Playing;
+        }
+    }
+
     onEatFood() {
         this.score++;
         this.uiMain?.updateScore(this.score);
@@ -122,16 +154,6 @@ export class GameManager extends Component {
         this.gameState = GameState.GameOver;
         this.uiGameOver?.show(this.score);
         console.log('Game Over! Score:', this.score);
-    }
-
-    public static getCellSize() {
-        return GameManager.Instance.cellSize;
-    }
-    public static getGridWidth() {
-        return GameManager.Instance.gridWidth;
-    }
-    public static getGridHeight() {
-        return GameManager.Instance.gridHeight;
     }
 }
 

@@ -1,32 +1,26 @@
 import { _decorator, Component, Node, Prefab, instantiate, Vec3 } from 'cc';
-import { GameManager } from './GameManager';
 const { ccclass, property } = _decorator;
 
 @ccclass('Snake')
 export class Snake extends Component {
-    @property({ type: Prefab, tooltip: '蛇节预制体' })
+    @property({ type: Prefab, tooltip: '蛇身体制体' })
     segmentPrefab: Prefab = null;
 
     private body: { x: number, y: number }[] = [];
     private segmentNodes: Node[] = [];
     private direction: { x: number, y: number } = { x: 1, y: 0 };
 
-    private cellSize: number;
-    private gridWidth: number;
-    private gridHeight: number;
-
-    start() {
-        this.init();
-    }
+    private cellSize: number = null;
+    private gridWidth: number = null;
+    private gridHeight: number = null;
 
     /**
-     * 初始化
+     * 初始化格子参数
      */
-    init() {
-        // 从GameManager获取参数
-        this.cellSize = GameManager.getCellSize();
-        this.gridWidth = GameManager.getGridWidth();
-        this.gridHeight = GameManager.getGridHeight();
+    init(cellSize: number, gridWidth: number, gridHeight: number) {
+        this.cellSize = cellSize;
+        this.gridWidth = gridWidth;
+        this.gridHeight = gridHeight;
     }
 
     /**
@@ -39,11 +33,6 @@ export class Snake extends Component {
         this.body = [{ x: startX, y: startY }];
         this.direction = { x: 1, y: 0 }; // 初始向右
         this.render();
-    }
-
-    update(deltaTime: number) {
-        // 这里只做演示：每秒移动一次
-        // 实际项目应由GameManager或定时器控制移动
     }
 
     move() {

@@ -1,11 +1,12 @@
-import { _decorator, Component, systemEvent, SystemEventType, EventKeyboard, KeyCode } from 'cc';
-import { Snake } from '../core/Snake';
+import {_decorator, Component, EventKeyboard, KeyCode, systemEvent, SystemEventType} from 'cc';
+import {Direction, GameManager} from "../core/GameManager";
+
 const { ccclass, property } = _decorator;
 
 @ccclass('InputHandler')
 export class InputHandler extends Component {
-    @property({ type: Snake, tooltip: '蛇的实例' })
-    snake: Snake = null;
+    @property({ type: GameManager, tooltip: '游戏管理器' })
+    gm: GameManager = null;
 
     onLoad() {
         systemEvent.on(SystemEventType.KEY_DOWN, this.onKeyDown, this);
@@ -16,27 +17,30 @@ export class InputHandler extends Component {
     }
 
     onKeyDown(event: EventKeyboard) {
-        if (!this.snake) {
+        if (!this.gm) {
             return;
         }
 
         switch(event.keyCode) {
             case KeyCode.KEY_W:
             case KeyCode.ARROW_UP:
-                this.snake.setDirection(0, 1);
+                this.gm.updateSnakeDirection(Direction.Up);
                 break;
             case KeyCode.KEY_S:
             case KeyCode.ARROW_DOWN:
-                this.snake.setDirection(0, -1);
+                this.gm.updateSnakeDirection(Direction.Down);
                 break;
             case KeyCode.KEY_A:
             case KeyCode.ARROW_LEFT:
-                this.snake.setDirection(-1, 0);
+                this.gm.updateSnakeDirection(Direction.Left);
                 break;
             case KeyCode.KEY_D:
             case KeyCode.ARROW_RIGHT:
-                this.snake.setDirection(1, 0);
+                this.gm.updateSnakeDirection(Direction.Right);
                 break;
+            case KeyCode.ESCAPE:
+            case KeyCode.KEY_P:
+                this.gm.pauseGame()
         }
     }
 } 

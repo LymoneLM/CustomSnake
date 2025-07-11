@@ -1,4 +1,4 @@
-import { _decorator, Component, Node, Prefab, instantiate, Vec3 } from 'cc';
+import { _decorator, Component, Node, Prefab, instantiate } from 'cc';
 const { ccclass, property } = _decorator;
 
 @ccclass('FoodSpawner')
@@ -8,14 +8,18 @@ export class FoodSpawner extends Component {
 
     private foodNode: Node = null;
     private foodPos: { x: number, y: number } = null;
-    @property({ type: Number, tooltip: '每格像素' })
-    public cellSize: number = 32;
-    @property({ type: Number, tooltip: '横向格子数' })
-    public gridWidth: number = 20;
-    @property({ type: Number, tooltip: '纵向格子数' })
-    public gridHeight: number = 20;
 
-    start() {
+    private cellSize: number = null;
+    private gridWidth: number = null;
+    private gridHeight: number = null;
+
+    /**
+     * 初始化格子参数
+     */
+    init(cellSize: number, gridWidth: number, gridHeight: number) {
+        this.cellSize = cellSize;
+        this.gridWidth = gridWidth;
+        this.gridHeight = gridHeight;
     }
 
     /**
