@@ -35,6 +35,9 @@ export class Snake extends Component {
         this.render();
     }
 
+    /**
+     * 蛇体向前移动一格
+     */
     move() {
         const head = {
             x: this.body[0].x + this.direction.x,
@@ -44,16 +47,14 @@ export class Snake extends Component {
         // 插入新头，移除尾巴
         this.body.unshift(head);
         this.body.pop();
-
-        // 渲染交给GameManager在合适的时机调用
-        // this.render();
     }
 
+    /**
+     * 蛇体生长（一格）
+     */
     grow() {
         const tail = this.body[this.body.length - 1];
         this.body.push({ x: tail.x, y: tail.y });
-        // 渲染交给GameManager在合适的时机调用
-        // this.render();
     }
 
     setDirection(dx: number, dy: number) {
@@ -94,6 +95,9 @@ export class Snake extends Component {
         return false;
     }
 
+    /**
+     * 渲染蛇体
+     */
     render() {
         while (this.segmentNodes.length < this.body.length) {
             const node = instantiate(this.segmentPrefab);
