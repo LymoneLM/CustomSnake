@@ -1,5 +1,5 @@
-import {_decorator, Component, EventKeyboard, KeyCode, systemEvent, SystemEventType} from 'cc';
-import {Direction, GameManager} from "../core/GameManager";
+import { _decorator, Component, EventKeyboard, KeyCode, input, Input } from 'cc';
+import { Direction, GameManager } from "../core/GameManager";
 
 const { ccclass, property } = _decorator;
 
@@ -9,11 +9,11 @@ export class InputHandler extends Component {
     gm: GameManager = null;
 
     onLoad() {
-        systemEvent.on(SystemEventType.KEY_DOWN, this.onKeyDown, this);
+        input.on(Input.EventType.KEY_DOWN, this.onKeyDown, this)
     }
 
     onDestroy() {
-        systemEvent.off(SystemEventType.KEY_DOWN, this.onKeyDown, this);
+        input.off(Input.EventType.KEY_DOWN, this.onKeyDown, this);
     }
 
     onKeyDown(event: EventKeyboard) {
