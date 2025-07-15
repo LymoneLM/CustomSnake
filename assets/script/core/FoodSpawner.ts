@@ -28,7 +28,10 @@ export class FoodSpawner extends Component {
         // 设置预制体大小
         [this.foodPrefab_1, this.foodPrefab_5, this.foodPrefab_10].forEach(prefab => {
             if (prefab && prefab.data) {
-                prefab.data.setScale(cellSize / prefab.data.width, cellSize / prefab.data.height, 1);
+                if (prefab.data.width > cellSize || prefab.data.height > cellSize) {
+                    const scale = Math.min(cellSize / prefab.data.width, cellSize / prefab.data.height);
+                    prefab.data.setScale(scale, scale, 1);
+                }
             }
         });
     }
@@ -77,8 +80,8 @@ export class FoodSpawner extends Component {
         }
         // 设置位置
         this.foodNode.setPosition(
-            (this.foodPos.x - this.gridWidth / 2) * this.cellSize + this.cellSize / 2,
-            (this.foodPos.y - this.gridHeight / 2) * this.cellSize + this.cellSize / 2,
+            this.foodPos.x * this.cellSize + this.cellSize / 2,
+            this.foodPos.y * this.cellSize + this.cellSize / 2,
             0
         );
         this.foodNode.active = true;

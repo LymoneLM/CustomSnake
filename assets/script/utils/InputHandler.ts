@@ -1,6 +1,5 @@
 import { _decorator, Component, EventKeyboard, KeyCode, input, Input } from 'cc';
 import { Direction, GameManager } from "../core/GameManager";
-
 const { ccclass, property } = _decorator;
 
 @ccclass('InputHandler')

@@ -22,8 +22,9 @@ export class Snake extends Component {
         this.gridWidth = gridWidth;
         this.gridHeight = gridHeight;
         // 设置蛇节预制体大小
-        if (this.segmentPrefab && this.segmentPrefab.data) {
-            this.segmentPrefab.data.setScale(this.cellSize / this.segmentPrefab.data.width, this.cellSize / this.segmentPrefab.data.height, 1);
+        if (this.segmentPrefab.data.width > cellSize || this.segmentPrefab.data.height > cellSize) {
+            const scale = Math.min(cellSize / this.segmentPrefab.data.width, cellSize / this.segmentPrefab.data.height);
+            this.segmentPrefab.data.setScale(scale, scale, 1);
         }
     }
 
@@ -114,8 +115,8 @@ export class Snake extends Component {
         }
         for (let i = 0; i < this.body.length; i++) {
             const pos = new Vec3(
-                (this.body[i].x - this.gridWidth / 2) * this.cellSize + this.cellSize / 2,
-                (this.body[i].y - this.gridHeight / 2) * this.cellSize + this.cellSize / 2,
+                this.body[i].x * this.cellSize + this.cellSize / 2,
+                this.body[i].y * this.cellSize + this.cellSize / 2,
                 0
             );
             this.segmentNodes[i].setPosition(pos);
