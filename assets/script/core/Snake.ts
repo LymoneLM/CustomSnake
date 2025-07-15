@@ -3,7 +3,9 @@ const { ccclass, property } = _decorator;
 
 @ccclass('Snake')
 export class Snake extends Component {
-    @property({ type: Prefab, tooltip: '蛇身体制体' })
+    @property({ type: Prefab, tooltip: '蛇头预制体' })
+    headPrefab: Prefab = null;
+    @property({ type: Prefab, tooltip: '蛇身体预制体' })
     segmentPrefab: Prefab = null;
 
     private body: { x: number, y: number }[] = [];
@@ -21,11 +23,13 @@ export class Snake extends Component {
         this.cellSize = cellSize;
         this.gridWidth = gridWidth;
         this.gridHeight = gridHeight;
-        // 设置蛇节预制体大小
-        if (this.segmentPrefab.data.width > cellSize || this.segmentPrefab.data.height > cellSize) {
-            const scale = Math.min(cellSize / this.segmentPrefab.data.width, cellSize / this.segmentPrefab.data.height);
-            this.segmentPrefab.data.setScale(scale, scale, 1);
-        }
+        // 设置蛇头和蛇节预制体大小
+        [this.headPrefab, this.segmentPrefab].forEach(prefab => {
+            if (prefab && prefab.data && (prefab.data.width > cellSize || prefab.data.height > cellSize)) {
+                const scale = Math.min(cellSize / prefab.data.width, cellSize / prefab.data.height);
+                prefab.data.setScale(scale, scale, 1);
+            }
+        });
     }
 
     /**
@@ -48,7 +52,6 @@ export class Snake extends Component {
             x: this.body[0].x + this.direction.x,
             y: this.body[0].y + this.direction.y
         };
-
         // 插入新头，移除尾巴
         this.body.unshift(head);
         this.body.pop();
@@ -104,8 +107,13 @@ export class Snake extends Component {
      * 渲染蛇体
      */
     render() {
+        // 节点池管理
         while (this.segmentNodes.length < this.body.length) {
-            const node = instantiate(this.segmentPrefab);
+            let prefab = this.segmentPrefab;
+            if (this.segmentNodes.length === 0 && this.headPrefab) {
+                prefab = this.headPrefab;
+            }
+            const node = instantiate(prefab);
             node.parent = this.node;
             this.segmentNodes.push(node);
         }
