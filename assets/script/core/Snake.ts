@@ -21,6 +21,10 @@ export class Snake extends Component {
         this.cellSize = cellSize;
         this.gridWidth = gridWidth;
         this.gridHeight = gridHeight;
+        // 设置蛇节预制体大小
+        if (this.segmentPrefab && this.segmentPrefab.data) {
+            this.segmentPrefab.data.setScale(this.cellSize / this.segmentPrefab.data.width, this.cellSize / this.segmentPrefab.data.height, 1);
+        }
     }
 
     /**

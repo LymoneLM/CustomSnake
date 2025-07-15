@@ -144,7 +144,8 @@ export class GameManager extends Component {
     }
 
     onEatFood() {
-        this.score++;
+        const foodScore = this.foodSpawner.getFoodScore();
+        this.score += foodScore;
         this.uiMain?.updateScore(this.score);
         this.snake.grow();
         this.foodSpawner.spawnFood(this.snake.getBody());

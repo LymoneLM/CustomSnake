@@ -3,11 +3,16 @@ const { ccclass, property } = _decorator;
 
 @ccclass('FoodSpawner')
 export class FoodSpawner extends Component {
-    @property({ type: Prefab, tooltip: '食物预制体' })
-    foodPrefab: Prefab = null;
+    @property({ type: Prefab, tooltip: '食物预制体x1' })
+    foodPrefab_1: Prefab = null;
+    @property({ type: Prefab, tooltip: '食物预制体x5' })
+    foodPrefab_5: Prefab = null;
+    @property({ type: Prefab, tooltip: '食物预制体x10' })
+    foodPrefab_10: Prefab = null;
 
     private foodNode: Node = null;
     private foodPos: { x: number, y: number } = null;
+    private foodScore: number = 1;
 
     private cellSize: number = null;
     private gridWidth: number = null;
@@ -20,6 +25,12 @@ export class FoodSpawner extends Component {
         this.cellSize = cellSize;
         this.gridWidth = gridWidth;
         this.gridHeight = gridHeight;
+        // 设置预制体大小
+        [this.foodPrefab_1, this.foodPrefab_5, this.foodPrefab_10].forEach(prefab => {
+            if (prefab && prefab.data) {
+                prefab.data.setScale(cellSize / prefab.data.width, cellSize / prefab.data.height, 1);
+            }
+        });
     }
 
     /**
@@ -45,9 +56,23 @@ export class FoodSpawner extends Component {
         // 随机选一个空格
         const idx = Math.floor(Math.random() * freeCells.length);
         this.foodPos = freeCells[idx];
+        // 概率决定食物类型
+        const rand = Math.random();
+        let prefab: Prefab;
+        if (rand < 0.6) {
+            prefab = this.foodPrefab_1;
+            this.foodScore = 1;
+        } else if (rand < 0.9) {
+            prefab = this.foodPrefab_5;
+            this.foodScore = 5;
+        } else {
+            prefab = this.foodPrefab_10;
+            this.foodScore = 10;
+        }
         // 节点池管理（这里只生成一个食物）
-        if (!this.foodNode) {
-            this.foodNode = instantiate(this.foodPrefab);
+        if (!this.foodNode || !this.foodNode.isValid || this.foodNode.name !== prefab.name) {
+            if (this.foodNode) this.foodNode.destroy();
+            this.foodNode = instantiate(prefab);
             this.foodNode.parent = this.node;
         }
         // 设置位置
@@ -75,6 +100,13 @@ export class FoodSpawner extends Component {
     getFoodPos() {
         // 若未生成食物则返回null，避免报错
         return this.foodPos ? { ...this.foodPos } : null;
+    }
+
+    /**
+     * 获取当前食物分值
+     */
+    getFoodScore() {
+        return this.foodScore;
     }
 }
 
