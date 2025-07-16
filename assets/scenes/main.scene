@@ -2264,6 +2264,18 @@
     },
     "_enabled": true,
     "__prefab": null,
+    "key_up": {
+      "__id__": 32
+    },
+    "key_down": {
+      "__id__": 39
+    },
+    "key_left": {
+      "__id__": 46
+    },
+    "key_right": {
+      "__id__": 53
+    },
     "_id": "09t1t64GNNSLwMPbX8V3Uf"
   },
   {
@@ -3042,15 +3054,15 @@
     "_enabled": true,
     "__prefab": null,
     "foodPrefab_1": {
-      "__uuid__": "463746ca-8819-416d-926e-2c0e4d062fad",
+      "__uuid__": "398285f9-de1d-4e9d-942b-b6ce395ffa94",
       "__expectedType__": "cc.Prefab"
     },
     "foodPrefab_5": {
-      "__uuid__": "463746ca-8819-416d-926e-2c0e4d062fad",
+      "__uuid__": "67326405-22bd-4526-ab32-45a2932ef6eb",
       "__expectedType__": "cc.Prefab"
     },
     "foodPrefab_10": {
-      "__uuid__": "463746ca-8819-416d-926e-2c0e4d062fad",
+      "__uuid__": "c4cf44cd-2418-460e-8763-fe1dd196489b",
       "__expectedType__": "cc.Prefab"
     },
     "_id": "9a8rI60wpKxraGn9Zy4r7z"
