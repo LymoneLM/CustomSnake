@@ -61,8 +61,15 @@ export class Snake extends Component {
      * 蛇体生长（一格）
      */
     grow() {
-        const tail = this.body[this.body.length - 1];
-        this.body.push({ x: tail.x, y: tail.y });
+        const len = this.body.length;
+        const tail = this.body[len - 1];
+        let newX = tail.x, newY = tail.y;
+        if (len === 1) {
+            // 只有一节时，反方向生长
+            newX -= this.direction.x;
+            newY -= this.direction.y;
+        }
+        this.body.push({ x: newX, y: newY });
     }
 
     setDirection(dx: number, dy: number) {
