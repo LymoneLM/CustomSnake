@@ -1,4 +1,4 @@
-import { _decorator, Component, Node, Prefab, instantiate } from 'cc';
+import { _decorator, Component, Node, Prefab, instantiate, director } from 'cc';
 const { ccclass, property } = _decorator;
 
 @ccclass('FoodSpawner')
@@ -9,23 +9,23 @@ export class FoodSpawner extends Component {
     foodPrefab_5: Prefab = null;
     @property({ type: Prefab, tooltip: '食物预制体x10' })
     foodPrefab_10: Prefab = null;
+    @property({ tooltip: '每帧消失检测' })
+    checkInterval: number = 0.1;
 
     private foodNode: Node = null;
     private foodPos: { x: number, y: number } = null;
     private foodScore: number = 1;
-
     private cellSize: number = null;
     private gridWidth: number = null;
     private gridHeight: number = null;
+    private foodTimer: number = 0;
+    private foodTimeout: number = 0;
+    private checkTimer: number = 0;
 
-    /**
-     * 初始化格子参数
-     */
-    init(cellSize: number, gridWidth: number, gridHeight: number) {
+    init(cellSize: number, gridWidth: number, gridHeight: number, moveInterval?: number) {
         this.cellSize = cellSize;
         this.gridWidth = gridWidth;
         this.gridHeight = gridHeight;
-        // 设置预制体大小
         [this.foodPrefab_1, this.foodPrefab_5, this.foodPrefab_10].forEach(prefab => {
             if (prefab && prefab.data) {
                 if (prefab.data.width > cellSize || prefab.data.height > cellSize) {
@@ -36,10 +36,6 @@ export class FoodSpawner extends Component {
         });
     }
 
-    /**
-     * 生成食物，避免与蛇身重叠
-     * @param snakeBody 蛇身格子坐标数组
-     */
     spawnFood(snakeBody: { x: number, y: number }[]) {
         // 计算所有空闲格子
         const occupied = new Set(snakeBody.map(seg => seg.x + ',' + seg.y));
@@ -52,14 +48,11 @@ export class FoodSpawner extends Component {
             }
         }
         if (freeCells.length === 0) {
-            // 没有空位，回收食物节点
             this.despawnFood();
             return;
         }
-        // 随机选一个空格
         const idx = Math.floor(Math.random() * freeCells.length);
         this.foodPos = freeCells[idx];
-        // 概率决定食物类型
         const rand = Math.random();
         let prefab: Prefab;
         if (rand < 0.6) {
@@ -72,44 +65,71 @@ export class FoodSpawner extends Component {
             prefab = this.foodPrefab_10;
             this.foodScore = 10;
         }
-        // 节点池管理（这里只生成一个食物）
         if (!this.foodNode || !this.foodNode.isValid || this.foodNode.name !== prefab.name) {
             if (this.foodNode) this.foodNode.destroy();
             this.foodNode = instantiate(prefab);
             this.foodNode.parent = this.node;
         }
-        // 设置位置
         this.foodNode.setPosition(
             this.foodPos.x * this.cellSize + this.cellSize / 2,
             this.foodPos.y * this.cellSize + this.cellSize / 2,
             0
         );
         this.foodNode.active = true;
+        // 计算限时
+        this.resetFoodTimer(snakeBody);
     }
 
-    /**
-     * 回收食物节点
-     */
+    resetFoodTimer(snakeBody: { x: number, y: number }[]) {
+        if (!snakeBody || snakeBody.length === 0) {
+            this.foodTimeout = 10; // fallback
+            this.foodTimer = 0;
+            return;
+        }
+        const head = snakeBody[0];
+        const dist = Math.max(Math.abs(head.x - this.foodPos.x), Math.abs(head.y - this.foodPos.y)); // 切比雪夫距离
+        if (this.foodScore === 10) {
+            this.foodTimeout = 2 * dist;
+        } else if (this.foodScore === 5) {
+            this.foodTimeout = 5 * dist;
+        } else {
+            this.foodTimeout = 10 * dist;
+        }
+        this.foodTimer = 0;
+    }
+
+    update(dt: number) {
+        if (!this.foodNode || !this.foodNode.active) return;
+        this.foodTimer += dt;
+        this.checkTimer += dt;
+        if (this.checkTimer >= this.checkInterval) {
+            this.checkTimer = 0;
+            if (this.foodTimeout > 0 && this.foodTimer >= this.foodTimeout) {
+                this.despawnFood();
+                director.emit('food-timeout');
+            }
+        }
+    }
+
     despawnFood() {
         if (this.foodNode) {
             this.foodNode.active = false;
         }
         this.foodPos = null;
+        this.foodTimer = 0;
+        this.foodTimeout = 0;
     }
 
-    /**
-     * 获取当前食物格子坐标
-     */
     getFoodPos() {
-        // 若未生成食物则返回null，避免报错
         return this.foodPos ? { ...this.foodPos } : null;
     }
 
-    /**
-     * 获取当前食物分值
-     */
     getFoodScore() {
         return this.foodScore;
+    }
+
+    isNeedRespawn() {
+        return !this.foodNode || !this.foodNode.active;
     }
 }
 
