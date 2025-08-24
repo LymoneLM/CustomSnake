@@ -6,8 +6,6 @@
     "registry": {
       "remote": {}
     },
-    "dependencies": {
-      "localization-editor": "1.0.2"
-    }
+    "dependencies": {}
   }
 }
